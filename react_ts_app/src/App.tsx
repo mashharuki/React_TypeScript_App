@@ -2,19 +2,40 @@
  * メインコンポーネントファイル
  */
 
-import React, { useState, ReactElement } from 'react';
+import React, { useState, ReactElement, ChangeEvent, KeyboardEvent } from 'react';
 import './App.css';
 
 function App():ReactElement {
   // ステート変数
-  const [ msg, setMsg ] = useState("This is sample message.")
-  const [ count, setCount ] = useState(0)
+  const [ val, setVal ] = useState(0)
+  const [ data, setData ] = useState<number[]>([])
 
-  // countを増やす関数
-  const doAction = () =>{
-    setCount(count + 1)
+  // 入力値を取得する関数
+  const doChange = (event: ChangeEvent): void => {
+    const ob = event.target as HTMLInputElement
+    const re = Number(ob.value)
+    setVal(re)
   }
 
+  // countを増やす関数
+  const doAction = (): void =>{
+    const arr:number[] = []
+    for (let item of data) {
+      arr.push(item)
+    }
+    arr.push(val)
+    setData(arr)
+    setVal(0)
+  }
+
+  // Enterキーを押された場合の処理
+  const doType = (event: KeyboardEvent): void => {
+    if(event.code == 'Enter') {
+      doAction()
+    }
+  }
+
+  let total = 0
   return (
     <div>
       <h1 className="bg-primary text-while p-2">React Sample</h1>
@@ -22,12 +43,26 @@ function App():ReactElement {
         <h2 className="my-3">click button!</h2>
         <div className="alert alert-primary">
           <div className="row px-2">
-            <h3 id="msg" className="col">{count} click.</h3>
+            <input type="number" className="col" onChange={doChange} onKeyPress={doType} value={val} />
             <button onClick={doAction} className="btn btn-primary col-2">
               Click!
             </button>
           </div>
         </div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>value</th>
+              <th>total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((v, k) => {
+              total += v
+              return <tr key={k}><td>{v}</td><td>{total}</td></tr>
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
